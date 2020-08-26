@@ -30,6 +30,29 @@ services:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./.apps:/data/apps:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.wordpress-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.wordpress-http.entrypoints=web"
+      - "traefik.http.routers.wordpress-http.rule=Host(`wordpress.example.com`)" #Domain anpassen
+      - "traefik.http.routers.wordpress-http.middlewares=wordpress-https@docker"
+      - "traefik.http.routers.wordpress.entrypoints=web-secure"
+      - "traefik.http.routers.wordpress.rule=Host(`wordpress.example.com`)" #Domain anpassen
+      - "traefik.http.routers.wordpress.tls=true"
+      - "traefik.http.routers.wordpress.tls.certresolver=default"
+      - "traefik.http.routers.wordpress.middlewares=secHeaders@file"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+    networks:
+      - default
+      - traefik_proxy
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+  default:
+    driver: bridge
+    
 volumes:
   datadb:
   home:
