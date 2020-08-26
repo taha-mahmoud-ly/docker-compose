@@ -25,13 +25,6 @@ services:
     networks:
       - default
       - traefik_proxy
-
-networks:
-  traefik_proxy:
-    external:
-      name: traefik_proxy
-  default:
-    driver: bridge
       
   db:
     image: dhis2/postgres-contrib
@@ -41,3 +34,9 @@ networks:
        POSTGRES_USER: app-hub
        POSTGRES_PASSWORD: app-hub
 
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+  default:
+    driver: bridge
