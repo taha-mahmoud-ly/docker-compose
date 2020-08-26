@@ -10,6 +10,24 @@ services:
       - db
     links:
       - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.covid19-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.covid19-http.entrypoints=web"
+      - "traefik.http.routers.covid19-http.rule=Host(`covid19.example.com`)" #Domain anpassen
+      - "traefik.http.routers.covid19-http.middlewares=covid19-https@docker"
+      - "traefik.http.routers.covid19.entrypoints=web-secure"
+      - "traefik.http.routers.covid19.rule=Host(`covid19.example.com`)" #Domain anpassen
+      - "traefik.http.routers.covid19.tls=true"
+      - "traefik.http.routers.covid19.tls.certresolver=default"
+      - "traefik.http.routers.covid19.middlewares=secHeaders@file"
+      - "traefik.http.services.covid19.loadbalancer.server.port=80"
+    networks:
+      - default
+      - traefik_proxy
+      
+      
+      
   db:
     image: dhis2/postgres-contrib
     restart: unless-stopped
